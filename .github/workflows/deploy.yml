@@ -9,7 +9,7 @@ on:
 job:
   frontend:
     runs-on: self-hosted
-      steps:
+    steps:
         - uses: action/checkout@v3
 
         - name: "building frontend image"
