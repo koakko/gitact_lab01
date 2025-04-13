@@ -1,0 +1,35 @@
+name: "frontend_&_backend_githubaction_test"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+job:
+  frontend:
+    runs-on: self-hosted
+      step:
+        - uses: action/checkout@v3
+
+        - name: "building frontend image"
+          working-directory: ./frontend
+          run: docker build -t frontend .
+        - name: "deploy frontend container"
+          run: |
+               docker stop cfrontend || true
+               docker rm cfrontend || true
+               docker run -d -p 8080:80 --name cfrontend frontend
+        - name: "building backend image"
+          working-directory: ./backend
+          run: docker build -t backend .
+        - name: "deploying backend image"
+          run: |
+               docker stop cbackend || true
+               docker rm cbackend || true
+               docker run -d -p 5000:5000 --name cbackend backend
+        - name: "testing for front/backend container"
+          run: |
+               sleep 5
+               curl http://localhost:8080
+               curl http://localhost:5000/api/hello
